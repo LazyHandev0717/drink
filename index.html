@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青春畅饮 - 创业比赛促销活动 510专属</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>青春畅饮</h1>
+            <p>创业比赛促销活动 - 大窑汽水，青春味道</p>
+        </header>
+
+        <div class="player-info">
+            <button class="btn" onclick="window.open('records.html', '_blank')">📊 记录管理</button>
+        </div>
+
+        <div class="products-section">
+            <div class="section-title">产品展示</div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image"><img src="chengzhi.png" style="width:80px;height:80px;"></div>
+                    <h3>大窑橙味汽水</h3>
+                    <div class="price">¥4<span class="original-price">¥5.0</span></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="lizhi.png" style="width:80px;height:80px;"></div>
+                    <h3>大窑荔枝味汽水</h3>
+                    <div class="price">¥4<span class="original-price">¥5.0</span></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">🫗</div>
+                    <h3>矿泉水</h3>
+                    <div class="price">¥1.5<span class="original-price">¥2.0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="games-section">
+            <div class="section-title">趣味游戏（demo1|5.9会继续增加）</div>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-icon">🎲</div>
+                    <h3>幸运骰子</h3>
+                    <p class="game-desc">花4元玩一次，掷骰子赢大奖！</p>
+                    <button class="btn" onclick="showPayment('dice', 4, '幸运骰子游戏')">开始游戏</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon">🎰</div>
+                    <h3>刮刮乐</h3>
+                    <p class="game-desc">花6元刮一次，惊喜等你拿！大奖概率更高！</p>
+                    <button class="btn" onclick="showPayment('scratch', 6, '刮刮乐游戏')">开始游戏</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon">🎯</div>
+                    <h3>幸运转盘</h3>
+                    <p class="game-desc">花7元转一次，大奖等你来！大奖概率更高！</p>
+                    <button class="btn" onclick="showPayment('wheel', 7, '幸运转盘游戏')">开始游戏</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon" style="font-size:3rem;"><img src="head.png" style="width:60px;height:60px;border-radius:50%;"></div>
+                    <h3>吉伊快飞</h3>
+                    <p class="game-desc">免费玩或者花钱玩或者购买附赠！挑战拿饮料！</p>
+                    <button class="btn" onclick="showGameModal()">开始游戏</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>510创业团队 | Edited by LazyHan</p>
+        </footer>
+    </div>
+
+    <div class="modal" id="game-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeGameModal()">×</span>
+            <h2>🎮 参与游戏</h2>
+            <div class="form-group">
+                <label>玩家类型：</label>
+                <select id="game-player-type" onchange="toggleStudentId()">
+                    <option value="free">🎲 免费参与</option>
+                    <option value="paid">💰 付费参与(¥2)</option>
+                    <option value="drink">🍹 购买饮料赠送</option>
+                </select>
+            </div>
+            <div class="form-group" id="student-id-field">
+                <label>学号：</label>
+                <input type="text" id="game-student-id" placeholder="请输入学号">
+            </div>
+            <div class="form-group" id="remaining-field">
+                <span id="remaining-count" class="badge badge-ok">剩余次数：2次</span>
+            </div>
+            <button class="btn-confirm" onclick="startGame()">确认参与</button>
+            <button class="btn-cancel" onclick="closeGameModal()">取消</button>
+        </div>
+    </div>
+
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePaymentModal()">×</span>
+            <h2>💰 付款</h2>
+            <div class="payment-amount" id="payment-amount">¥0</div>
+            <div class="payment-qrcode">💳</div>
+            <div class="payment-hint" id="payment-hint">请使用微信或支付宝扫码支付</div>
+            <button class="btn-confirm" onclick="confirmPayment()">确认支付</button>
+            <button class="btn-cancel" onclick="closePaymentModal()">取消</button>
+        </div>
+    </div>
+
+    <div class="modal" id="alert-modal">
+        <div class="modal-content">
+            <h2>提示</h2>
+            <p id="alert-message"></p>
+            <button class="btn-cancel" onclick="closeAlert()">确定</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

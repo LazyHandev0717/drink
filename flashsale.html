@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>限时秒杀 - 青春畅饮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>⚡ 限时秒杀</h1>
+            <p>每天12:00-13:00，矿泉水特价¥1/瓶</p>
+        </header>
+
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div style="margin: 20px 0;">
+                <div style="font-size: 1.2rem; color: #666; margin-bottom: 10px;">距离下次秒杀开始：</div>
+                <div class="countdown-timer" id="flash-countdown">00:00:00</div>
+            </div>
+            <div class="flash-sale-price">¥1 / 瓶</div>
+            <div class="order-form">
+                <div class="form-group">
+                    <label>购买数量</label>
+                    <input type="number" id="flash-qty" min="1" value="1">
+                </div>
+                <div class="cart-summary">
+                    <h4>订单详情</h4>
+                    <div class="cart-item">
+                        <span>矿泉水 x <span id="flash-qty-display">1</span></span>
+                        <span id="flash-total">¥1.0</span>
+                    </div>
+                </div>
+                <button class="btn" id="flash-btn" onclick="submitFlashSale()" style="width: 100%; margin-top: 20px;">立即抢购</button>
+                </div>
+
+                <button class="btn btn-outline" style="margin-top: 20px;" onclick="window.location.href='index.html'">返回首页</button>
+        </div>
+
+        <footer class="footer">
+            <p>青春畅饮创业团队 | 联系电话：138-xxxx-xxxx</p>
+        </footer>
+    </div>
+
+    <script>
+function updateFlashSaleTotal() {
+    const qty = parseInt(document.getElementById('flash-qty').value) || 1;
+    document.getElementById('flash-qty-display').textContent = qty;
+    document.getElementById('flash-total').textContent = '¥' + qty.toFixed(1);
+}
+
+function submitFlashSale() {
+    const qty = parseInt(document.getElementById('flash-qty').value) || 1;
+    const flashBtn = document.getElementById('flash-btn');
+    flashBtn.style.display = 'none';
+    alert('✅ 秒杀订单已提交！\n您购买了 ' + qty + ' 瓶矿泉水，\n特价：¥' + qty.toFixed(1) + '，\n原价：¥' + (qty * 1.5).toFixed(1) + '，\n节省：¥' + (qty * 0.5).toFixed(1) + '！');
+}
+
+function updateCountdown() {
+    const now = new Date();
+    let saleEnd = new Date(now);
+    saleEnd.setHours(13, 0, 0, 0);
+    
+    if (now.getHours() >= 13) {
+        saleEnd.setDate(saleEnd.getDate() + 1);
+        saleEnd.setHours(12, 0, 0, 0);
+    }
+    
+    const diff = saleEnd - now;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('flash-countdown').textContent = 
+        hours.toString().padStart(2, '0') + ':' + 
+        minutes.toString().padStart(2, '0') + ':' + 
+        seconds.toString().padStart(2, '0');
+}
+
+document.getElementById('flash-qty').addEventListener('input', updateFlashSaleTotal);
+setInterval(updateCountdown, 1000);
+updateCountdown();
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录管理 - 青春畅饮</title>
+    <style>
+        .actions { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; }
+        .btn-secondary { background: white; color: #667eea; }
+        .btn-danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
+        .table-container { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
+        th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; }
+        tr:hover { background: #f8f9fa; }
+        .empty-message { text-align: center; padding: 50px; color: #999; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 记录管理</h1>
+            <p>数据存储在浏览器本地，刷新不丢失</p>
+        </header>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="showAddModal()">添加记录</button>
+            <button class="btn btn-secondary" onclick="exportCSV()">导出Excel表格</button>
+            <button class="btn btn-danger" onclick="confirmClear()">清空所有记录</button>
+            <button class="btn btn-secondary" onclick="window.location.href='index.html'">返回首页</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>学号</th>
+                        <th>游戏次数</th>
+                        <th>玩家类型</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="records-body">
+                    <tr><td colspan="5" class="empty-message">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="footer">
+            <p>青春畅饮创业团队</p>
+        </footer>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAddModal()">×</span>
+            <h2>添加记录</h2>
+            <div class="form-group">
+                <label>日期：</label>
+                <input type="date" id="add-date" value="">
+            </div>
+            <div class="form-group">
+                <label>学号：</label>
+                <input type="text" id="add-student-id" placeholder="请输入学号">
+            </div>
+            <div class="form-group">
+                <label>玩家类型：</label>
+                <select id="add-player-type">
+                    <option value="free">免费参与</option>
+                    <option value="paid">付费参与</option>
+                    <option value="drink">购买饮料赠送</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="addRecord()">确认添加</button>
+                <button class="btn btn-secondary" onclick="closeAddModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content">
+            <h2>⚠️ 确认操作</h2>
+            <p id="confirm-message"></p>
+            <div class="btn-group">
+                <button class="btn btn-danger" id="confirm-btn">确认</button>
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="records.js"></script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉伊快飞 - 青春畅饮</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .game-header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .game-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        .game-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .player-info-bar {
+            background: rgba(255,255,255,0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-weight: bold;
+        }
+        .game-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        #bird {
+            position: absolute;
+            left: 100px;
+            top: 200px;
+            width: 50px;
+            height: 50px;
+            transition: transform 0.1s;
+            z-index: 10;
+            transform: scaleX(-1);
+        }
+        .pipe {
+            position: absolute;
+            width: 60px;
+            background: linear-gradient(90deg, #2E7D32 0%, #1B5E20 100%);
+            border-radius: 8px;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
+        }
+        .pipe-top {
+            top: 0;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+        .pipe-bottom {
+            bottom: 0;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+        #target-score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 20;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        #player-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 20;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        #ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
+            z-index: 5;
+        }
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 30;
+            color: white;
+        }
+        #game-over-screen {
+            display: none;
+        }
+        .overlay-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .overlay-score {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .overlay-prize {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #27ae60;
+        }
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            background: white;
+            color: #4facfe;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .btn-back {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .instructions {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            color: #333;
+        }
+        .instructions p {
+            margin: 5px 0;
+            font-size: 1rem;
+        }
+        .rules {
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .rules h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .rules ul {
+            list-style: none;
+            padding: 0;
+        }
+        .rules li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+        .rules li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <h1><img src="head.png" style="width:50px;height:50px;vertical-align:middle;margin-right:10px;">吉伊快飞</h1>
+        <p>挑战反应速度，赢取饮料！</p>
+    </div>
+    
+    <div class="player-info-bar">
+        <span>玩家类型：<span id="display-type">免费玩家</span></span>
+        <span>学号：<span id="display-id">-</span></span>
+    </div>
+    
+    <div class="game-area">
+        <div id="game-container">
+            <div id="score">0</div>
+            <div id="target-score">目标: 水60分 / 汽水90分</div>
+            <div id="player-badge">免费玩家</div>
+            <img id="bird" src="head.png" alt="鸟">
+            <div id="ground"></div>
+            
+            <div id="start-screen">
+                <div class="overlay-title">准备开始</div>
+                <button class="btn" onclick="startGame()">开始游戏</button>
+                <button class="btn btn-back" onclick="window.location.href='index.html'">返回首页</button>
+            </div>
+            
+            <div id="game-over-screen">
+                <div class="overlay-title">游戏结束</div>
+                <div class="overlay-score" id="final-score">得分: 0</div>
+                <div class="overlay-prize" id="final-prize"></div>
+                <button class="btn btn-back" onclick="window.location.href='index.html'">关闭页面返回首页</button>
+            </div>
+        </div>
+        <audio id="jump-audio" src="shout.wav" preload="auto">
+    </div>
+    
+    <div class="instructions">
+        <p>🎮 操作说明：点击屏幕或按空格键让小鸟上升</p>
+    </div>
+
+    <div class="rules">
+        <h3>🎯 游戏规则</h3>
+        <ul>
+            <li>🎲 免费玩家：达到60分得矿泉水x1，90分得汽水x1</li>
+            <li>💰 付费玩家(¥2)：达到30分得矿泉水x1，60分得汽水x1</li>
+            <li>🍹 购饮玩家：达到40分得矿泉水x1，70分得汽水x1</li>
+            <li>🔒 每个学号每天最多玩2次</li>
+            <li>🏆 封顶奖励：1瓶饮料</li>
+        </ul>
+    </div>
+
+    <script>
+let gameContainer;
+let bird;
+let scoreDisplay;
+let targetScoreDisplay;
+let playerBadge;
+let startScreen;
+let gameOverScreen;
+let finalScore;
+let finalPrize;
+
+let isPlaying = false;
+let score = 0;
+let birdY = 200;
+let velocity = 0;
+let gravity = 0.5;
+let jumpForce = -8.5;
+let pipeSpeed = 4;
+let scorePerPipe = 2;
+let pipes = [];
+let gameLoop;
+let pipeInterval;
+
+let playerType = 'free';
+let studentId = '';
+
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        type: params.get('type') || 'free',
+        id: params.get('id') || ''
+    };
+}
+
+function getTargetScores() {
+    switch(playerType) {
+        case 'paid':
+            return { water: 30, drink: 60, name: '付费玩家' };
+        case 'drink':
+            return { water: 40, drink: 70, name: '购饮玩家' };
+        default:
+            return { water: 60, drink: 90, name: '免费玩家' };
+    }
+}
+
+function updateUI() {
+    const targets = getTargetScores();
+    playerBadge.textContent = targets.name;
+    targetScoreDisplay.textContent = `目标: 水${targets.water}分 / 汽水${targets.drink}分`;
+    document.getElementById('display-type').textContent = targets.name;
+    document.getElementById('display-id').textContent = studentId || '-';
+}
+
+function init() {
+    const params = getUrlParams();
+    playerType = params.type;
+    studentId = params.id;
+    
+    gameContainer = document.getElementById('game-container');
+    bird = document.getElementById('bird');
+    scoreDisplay = document.getElementById('score');
+    targetScoreDisplay = document.getElementById('target-score');
+    playerBadge = document.getElementById('player-badge');
+    startScreen = document.getElementById('start-screen');
+    gameOverScreen = document.getElementById('game-over-screen');
+    finalScore = document.getElementById('final-score');
+    finalPrize = document.getElementById('final-prize');
+    
+    updateUI();
+}
+
+function playJumpSound() {
+    try {
+        const audio = document.getElementById('jump-audio');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
+    } catch (e) {}
+}
+
+function startGame() {
+    startScreen.style.display = 'none';
+    gameOverScreen.style.display = 'none';
+    
+    score = 0;
+    birdY = 200;
+    velocity = 0;
+    isPlaying = true;
+    scoreDisplay.textContent = '0';
+    
+    pipes.forEach(pipe => {
+        if (pipe.top.parentNode) pipe.top.parentNode.removeChild(pipe.top);
+        if (pipe.bottom.parentNode) pipe.bottom.parentNode.removeChild(pipe.bottom);
+    });
+    pipes = [];
+    
+    bird.style.top = birdY + 'px';
+    
+    gameContainer.addEventListener('click', jump);
+    document.addEventListener('keydown', handleKeydown);
+    
+    gameLoop = setInterval(update, 16);
+    setTimeout(() => {
+        if (isPlaying) {
+            pipeInterval = setInterval(createPipe, 800);
+        }
+    }, 300);
+}
+
+function jump() {
+    if (isPlaying) {
+        velocity = jumpForce;
+        playJumpSound();
+    }
+}
+
+function handleKeydown(e) {
+    if (e.code === 'Space' && isPlaying) {
+        e.preventDefault();
+        velocity = jumpForce;
+        playJumpSound();
+    }
+}
+
+function update() {
+    velocity += gravity;
+    birdY += velocity;
+    
+    if (birdY < 0) {
+        birdY = 0;
+        velocity = 0;
+    }
+    
+    bird.style.top = birdY + 'px';
+    
+    const containerHeight = gameContainer.offsetHeight - 30;
+    if (birdY > containerHeight - 50) {
+        gameOver();
+        return;
+    }
+    
+    pipes.forEach((pipe, index) => {
+        pipe.x -= pipeSpeed;
+        pipe.top.style.left = pipe.x + 'px';
+        pipe.bottom.style.left = pipe.x + 'px';
+        
+        if (pipe.x + 60 < 0) {
+            gameContainer.removeChild(pipe.top);
+            gameContainer.removeChild(pipe.bottom);
+            pipes.splice(index, 1);
+        }
+        
+        if (checkCollision(pipe)) {
+            gameOver();
+            return;
+        }
+        
+        if (!pipe.scored && pipe.x + 60 < 100) {
+            pipe.scored = true;
+            score += scorePerPipe;
+            scoreDisplay.textContent = score;
+            
+            if (score >= 20) {
+                if (score % 5 === 0 && pipeSpeed < 10) {
+                    pipeSpeed += 0.4;
+                }
+            }
+        }
+    });
+}
+
+function checkCollision(pipe) {
+    const birdRect = bird.getBoundingClientRect();
+    const containerRect = gameContainer.getBoundingClientRect();
+    
+    const padding = 20;
+    const birdLeft = birdRect.left - containerRect.left + padding;
+    const birdRight = birdLeft + birdRect.width - padding * 2;
+    const birdTop = birdRect.top - containerRect.top + padding;
+    const birdBottom = birdTop + birdRect.height - padding * 2;
+    
+    const pipePadding = 10;
+    const pipeLeft = pipe.x + pipePadding;
+    const pipeRight = pipe.x + 60 - pipePadding;
+    
+    if (birdRight > pipeLeft && birdLeft < pipeRight) {
+        if (birdTop < pipe.gapY || birdBottom > pipe.gapY + pipe.gapHeight) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function createPipe() {
+    if (!isPlaying) return;
+    
+    const containerHeight = gameContainer.offsetHeight - 30;
+    const gapHeight = 180;
+    const gapY = Math.random() * (containerHeight - gapHeight - 80) + 40;
+    
+    const topPipe = document.createElement('div');
+    topPipe.className = 'pipe pipe-top';
+    topPipe.style.height = gapY + 'px';
+    topPipe.style.left = gameContainer.offsetWidth + 'px';
+    
+    const bottomPipe = document.createElement('div');
+    bottomPipe.className = 'pipe pipe-bottom';
+    bottomPipe.style.height = (containerHeight - gapY - gapHeight) + 'px';
+    bottomPipe.style.left = gameContainer.offsetWidth + 'px';
+    
+    gameContainer.appendChild(topPipe);
+    gameContainer.appendChild(bottomPipe);
+    
+    pipes.push({
+        top: topPipe,
+        bottom: bottomPipe,
+        x: gameContainer.offsetWidth,
+        gapY: gapY,
+        gapHeight: gapHeight,
+        scored: false
+    });
+}
+
+function gameOver() {
+    isPlaying = false;
+    clearInterval(gameLoop);
+    clearInterval(pipeInterval);
+    
+    gameContainer.removeEventListener('click', jump);
+    document.removeEventListener('keydown', handleKeydown);
+    
+    finalScore.textContent = '得分: ' + score;
+    
+    const targets = getTargetScores();
+    let prize = '未达到奖励分数';
+    if (score >= targets.drink) {
+        prize = '🎉 获得大窑汽水x1！';
+    } else if (score >= targets.water) {
+        prize = '🎊 获得矿泉水x1！';
+    }
+    finalPrize.textContent = prize;
+    
+    gameOverScreen.style.display = 'flex';
+}
+
+window.addEventListener('load', init);
+    </script>
+</body>
+</html>

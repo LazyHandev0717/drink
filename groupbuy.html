@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团购优惠 - 青春畅饮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>💰 团购优惠</h1>
+            <p>一次性购买10瓶以上，享受8折优惠</p>
+        </header>
+
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="order-form">
+                <div class="form-group">
+                    <label>选择商品类型</label>
+                    <select id="groupbuy-type">
+                        <option value="orange">大窑橙味汽水 (¥3.5)</option>
+                        <option value="lychee">大窑荔枝味汽水 (¥3.5)</option>
+                        <option value="water">矿泉水 (¥1.5)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>购买数量（最少10瓶）</label>
+                    <input type="number" id="groupbuy-qty" min="10" value="10">
+                </div>
+                <div class="cart-summary">
+                    <h4>订单详情</h4>
+                    <div class="cart-item">
+                        <span>商品 x <span id="group-qty">10</span></span>
+                        <span id="group-original">¥35.0</span>
+                    </div>
+                    <div class="cart-item">
+                        <span>8折优惠</span>
+                        <span style="color: #e74c3c;">-¥7.0</span>
+                    </div>
+                    <div class="cart-total">
+                        总计：<span id="group-total">¥28.0</span>
+                    </div>
+                </div>
+                <button class="btn" id="groupbuy-btn" onclick="submitGroupBuy()" style="width: 100%; margin-top: 20px;">确认团购</button>
+            </div>
+
+            <button class="btn btn-outline" style="margin-top: 20px;" onclick="window.location.href='index.html'">返回首页</button>
+        </div>
+
+        <footer class="footer">
+            <p>青春畅饮创业团队 | 联系电话：138-xxxx-xxxx</p>
+        </footer>
+    </div>
+
+    <script>
+function updateGroupBuyTotal() {
+    const qty = parseInt(document.getElementById('groupbuy-qty').value) || 10;
+    const type = document.getElementById('groupbuy-type').value;
+    const prices = { orange: 3.5, lychee: 3.5, water: 1.5 };
+    const original = qty * prices[type];
+    const discount = original * 0.2;
+    const total = original - discount;
+    document.getElementById('group-qty').textContent = qty;
+    document.getElementById('group-original').textContent = '¥' + original.toFixed(1);
+    document.getElementById('group-total').textContent = '¥' + total.toFixed(1);
+}
+
+function submitGroupBuy() {
+    const qty = parseInt(document.getElementById('groupbuy-qty').value) || 10;
+    const type = document.getElementById('groupbuy-type').value;
+    const typeNames = { orange: '大窑橙味汽水', lychee: '大窑荔枝味汽水', water: '矿泉水' };
+    const prices = { orange: 3.5, lychee: 3.5, water: 1.5 };
+    const original = qty * prices[type];
+    const total = original * 0.8;
+    const groupBtn = document.getElementById('groupbuy-btn');
+    groupBtn.style.display = 'none';
+    alert('✅ 团购订单已提交！\n您购买了 ' + qty + ' 瓶' + typeNames[type] + '，\n原价：¥' + original.toFixed(1) + '，\n优惠后：¥' + total.toFixed(1) + '，\n节省：¥' + (original - total).toFixed(1) + '！');
+}
+
+document.getElementById('groupbuy-qty').addEventListener('input', updateGroupBuyTotal);
+document.getElementById('groupbuy-type').addEventListener('change', updateGroupBuyTotal);
+    </script>
+</body>
+</html>

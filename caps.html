@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集瓶盖换礼 - 青春畅饮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>🎟️ 集瓶盖换礼</h1>
+            <p>收集5个瓶盖，兑换一瓶饮料</p>
+        </header>
+
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <p style="color: #f39c12; font-weight: bold; margin-bottom: 20px;">当前瓶盖数量：<span id="cap-count">0</span>个</p>
+            <div class="bottle-cap-counter" id="cap-counter">
+            </div>
+            <button class="btn" id="add-cap-btn" onclick="addCap()">添加瓶盖</button>
+            <button class="btn" id="redeem-btn" style="margin-left: 10px; display: none;" onclick="redeemCaps()">兑换饮料</button>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #fff8f5; border-radius: 10px;">
+                <p>已兑换饮料：<span id="redeemed-count">0</span>瓶</p>
+                <p>剩余瓶盖：<span id="remaining-caps">0</span>个</p>
+            </div>
+
+            <button class="btn btn-outline" style="margin-top: 20px;" onclick="window.location.href='index.html'">返回首页</button>
+        </div>
+
+        <footer class="footer">
+            <p>510创业团队 | Edited by LazyHan</p>
+        </footer>
+    </div>
+
+    <script>
+let bottleCaps = 0;
+let redeemedCount = 0;
+
+function updateCapDisplay() {
+    document.getElementById('cap-count').textContent = bottleCaps;
+    document.getElementById('remaining-caps').textContent = bottleCaps % 5;
+    document.getElementById('redeemed-count').textContent = Math.floor(bottleCaps / 5);
+    
+    const counter = document.getElementById('cap-counter');
+    counter.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+        const cap = document.createElement('div');
+        cap.className = 'cap' + (i < bottleCaps % 5 ? ' filled' : '');
+        cap.textContent = i + 1;
+        cap.onclick = addCap;
+        counter.appendChild(cap);
+    }
+    
+    const redeemBtn = document.getElementById('redeem-btn');
+    if (bottleCaps >= 5) {
+        redeemBtn.style.display = 'inline-block';
+    } else {
+        redeemBtn.style.display = 'none';
+    }
+}
+
+function addCap() {
+    bottleCaps++;
+    updateCapDisplay();
+}
+
+function redeemCaps() {
+    if (bottleCaps >= 5) {
+        alert('🎉 恭喜！您已成功兑换 ' + Math.floor(bottleCaps / 5) + ' 瓶大窑汽水！');
+        bottleCaps = bottleCaps % 5;
+        document.getElementById('add-cap-btn').style.display = 'none';
+        document.getElementById('redeem-btn').style.display = 'none';
+        updateCapDisplay();
+    }
+}
+
+updateCapDisplay();
+    </script>
+</body>
+</html>

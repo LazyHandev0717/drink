@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>买二送一 - 青春畅饮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>🎁 买二送一</h1>
+            <p>购买任意两瓶饮料，赠送一瓶矿泉水</p>
+        </header>
+
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="order-form">
+                <div class="form-group">
+                    <label>选择饮料类型</label>
+                    <select id="drink-type">
+                        <option value="orange">大窑橙味汽水 (¥3.5)</option>
+                        <option value="lychee">大窑荔枝味汽水 (¥3.5)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>购买数量（最少2瓶）</label>
+                    <input type="number" id="buy2get1-qty" min="2" value="2">
+                </div>
+                <div class="cart-summary">
+                    <h4>订单详情</h4>
+                    <div class="cart-item">
+                        <span>饮料 x <span id="calc-qty">2</span></span>
+                        <span id="calc-drink-price">¥7.0</span>
+                    </div>
+                    <div class="cart-item">
+                        <span>赠送矿泉水</span>
+                        <span style="color: #27ae60;">免费</span>
+                    </div>
+                    <div class="cart-total">
+                        总计：<span id="calc-total">¥7.0</span>
+                    </div>
+                </div>
+                <button class="btn" id="buy2get1-btn" onclick="submitBuy2Get1()" style="width: 100%; margin-top: 20px;">确认购买</button>
+            </div>
+
+            <button class="btn btn-outline" style="margin-top: 20px;" onclick="window.location.href='index.html'">返回首页</button>
+        </div>
+
+        <footer class="footer">
+            <p>青春畅饮创业团队 | 联系电话：138-xxxx-xxxx</p>
+        </footer>
+    </div>
+
+    <script>
+function updateBuy2Get1Total() {
+    const qty = parseInt(document.getElementById('buy2get1-qty').value) || 2;
+    const price = 3.5;
+    const total = qty * price;
+    document.getElementById('calc-qty').textContent = qty;
+    document.getElementById('calc-drink-price').textContent = '¥' + total.toFixed(1);
+    document.getElementById('calc-total').textContent = '¥' + total.toFixed(1);
+}
+
+function submitBuy2Get1() {
+    const qty = parseInt(document.getElementById('buy2get1-qty').value) || 2;
+    const drinkType = document.getElementById('drink-type').value;
+    const drinkName = drinkType === 'orange' ? '大窑橙味汽水' : '大窑荔枝味汽水';
+    const buyBtn = document.getElementById('buy2get1-btn');
+    buyBtn.style.display = 'none';
+    alert('✅ 订单已提交！\n您购买了 ' + qty + ' 瓶' + drinkName + '，\n赠送 ' + Math.floor(qty / 2) + ' 瓶矿泉水！\n总计：¥' + (qty * 3.5).toFixed(1));
+}
+
+document.getElementById('buy2get1-qty').addEventListener('input', updateBuy2Get1Total);
+    </script>
+</body>
+</html>

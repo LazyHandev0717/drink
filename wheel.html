@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸运转盘 - 青春畅饮</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 30px;
+        }
+        #wheel-canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e74c3c;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+            z-index: 10;
+        }
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: white;
+            color: #f5576c;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-back {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result.win {
+            color: #27ae60;
+        }
+        .result.normal {
+            color: #333;
+        }
+        .rules {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .rules h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .rules ul {
+            list-style: none;
+            padding: 0;
+        }
+        .rules li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+        .rules li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 幸运转盘</h1>
+        <p class="subtitle">花7元转一次，大奖等你来！大奖概率更高！</p>
+        
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <canvas id="wheel-canvas" width="450" height="450"></canvas>
+            <div class="wheel-center">🎰</div>
+        </div>
+        
+        <button class="btn" id="spin-btn" onclick="spinWheel()">转动转盘</button>
+        <button class="btn btn-back" onclick="window.location.href='index.html'">返回首页</button>
+        
+        <div class="result" id="result"></div>
+
+        <div class="rules">
+            <h3>🎯 游戏规则</h3>
+            <ul>
+                <li>🎉 一等奖：大窑汽水x3</li>
+                <li>🎊 二等奖：大窑汽水x2</li>
+                <li>😊 参与奖：大窑汽水x1（保底）</li>
+                <li>💰 每次游戏费用：¥7</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+let wheelSpinning = false;
+let currentRotation = 0;
+
+const prizes = [
+    { text: '大窑汽水x3', full: '大窑汽水x3', color: '#e74c3c' },
+    { text: '大窑汽水x1', full: '大窑汽水x1', color: '#3498db' },
+    { text: '大窑汽水x2', full: '大窑汽水x2', color: '#27ae60' },
+    { text: '大窑汽水x1', full: '大窑汽水x1', color: '#f39c12' },
+    { text: '大窑汽水x2', full: '大窑汽水x2', color: '#9b59b6' },
+    { text: '大窑汽水x1', full: '大窑汽水x1', color: '#1abc9c' },
+    { text: '大窑汽水x2', full: '大窑汽水x2', color: '#e67e22' },
+    { text: '大窑汽水x1', full: '大窑汽水x1', color: '#34495e' }
+];
+
+function drawWheel(rotation = 0) {
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = canvas.width / 2 - 10;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate((rotation * Math.PI) / 180);
+    
+    const segments = prizes.length;
+    const anglePerSegment = (2 * Math.PI) / segments;
+    
+    for (let i = 0; i < segments; i++) {
+        const startAngle = i * anglePerSegment - Math.PI / 2;
+        const endAngle = startAngle + anglePerSegment;
+        
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = prizes[i].color;
+        ctx.fill();
+        
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        ctx.save();
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Microsoft YaHei';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(prizes[i].text, radius * 0.65, 0);
+        ctx.restore();
+    }
+    
+    ctx.restore();
+}
+
+function spinWheel() {
+    if (wheelSpinning) return;
+    
+    wheelSpinning = true;
+    document.getElementById('spin-btn').disabled = true;
+    document.getElementById('result').textContent = '';
+    document.getElementById('result').className = 'result';
+    
+    const targetRotation = Math.random() * 360 + 720 + currentRotation;
+    const duration = 4000;
+    const startTime = Date.now();
+    const startRotation = currentRotation;
+    
+    function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 4);
+        
+        currentRotation = startRotation + (targetRotation - startRotation) * easeProgress;
+        drawWheel(currentRotation);
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            wheelSpinning = false;
+            document.getElementById('spin-btn').disabled = false;
+            showResult();
+        }
+    }
+    
+    animate();
+}
+
+function showResult() {
+    const normalizedRotation = currentRotation % 360;
+    const segmentIndex = Math.floor((360 - normalizedRotation + 22.5) / 45) % 8;
+    
+    const prize = prizes[segmentIndex];
+    const resultDiv = document.getElementById('result');
+    const spinBtn = document.getElementById('spin-btn');
+    
+    spinBtn.style.display = 'none';
+    
+    if (prize.full.includes('汽水')) {
+        resultDiv.className = 'result win';
+        resultDiv.textContent = '🎉 恭喜！获得 ' + prize.full + '！';
+    } else {
+        resultDiv.className = 'result normal';
+        resultDiv.textContent = '😊 获得 ' + prize.full + '！';
+    }
+}
+
+drawWheel();
+    </script>
+</body>
+</html>

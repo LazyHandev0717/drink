@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刮刮乐 - 青春畅饮</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .scratch-area {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto 30px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .prize-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+            z-index: 1;
+        }
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: crosshair;
+        }
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .btn-back {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .instructions {
+            color: rgba(255,255,255,0.8);
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+        .rules {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .rules h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .rules ul {
+            list-style: none;
+            padding: 0;
+        }
+        .rules li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+        .rules li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎰 刮刮乐</h1>
+        <p class="subtitle">花6元刮一次，惊喜等你拿！大奖概率更高！</p>
+        
+        <div class="scratch-area" id="scratch-area">
+            <div class="prize-text" id="prize-text">🎁 刮开查看奖品</div>
+            <canvas id="scratch-canvas"></canvas>
+        </div>
+        
+        <button class="btn" id="scratch-btn" onclick="initScratch()">开始刮奖</button>
+        <button class="btn btn-back" onclick="window.location.href='index.html'">返回首页</button>
+        
+        <p class="instructions">💡 用鼠标刮开灰色区域查看奖品</p>
+
+        <div class="rules">
+            <h3>🎯 游戏规则</h3>
+            <ul>
+                <li>🎉 一等奖：大窑汽水x2</li>
+                <li>🎊 二等奖：大窑汽水x1</li>
+                <li>😊 参与奖：矿泉水x1（保底）</li>
+                <li>💰 每次游戏费用：¥6</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+const prizes = [
+    '大窑汽水x2',
+    '大窑汽水x1',
+    '大窑汽水x1',
+    '大窑汽水x2',
+    '矿泉水x1',
+    '大窑汽水x1'
+];
+
+let currentPrize = '';
+
+function initScratch() {
+    const canvas = document.getElementById('scratch-canvas');
+    const prizeText = document.getElementById('prize-text');
+    const container = document.getElementById('scratch-area');
+    const scratchBtn = document.getElementById('scratch-btn');
+    
+    scratchBtn.style.display = 'none';
+    
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    
+    const ctx = canvas.getContext('2d');
+    
+    ctx.fillStyle = '#999';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#666';
+    ctx.font = 'bold 24px Microsoft YaHei';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('刮开这里', canvas.width / 2, canvas.height / 2);
+    
+    currentPrize = prizes[Math.floor(Math.random() * prizes.length)];
+    prizeText.textContent = '🎁 ' + currentPrize;
+    
+    let isDrawing = false;
+    
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        scratch(e);
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+        if (isDrawing) scratch(e);
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+    });
+    
+    canvas.addEventListener('mouseleave', () => {
+        isDrawing = false;
+    });
+    
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDrawing = true;
+        scratch(e.touches[0]);
+    });
+    
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (isDrawing) scratch(e.touches[0]);
+    });
+    
+    canvas.addEventListener('touchend', () => {
+        isDrawing = false;
+    });
+    
+    function scratch(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function resetScratch() {
+    initScratch();
+}
+
+window.addEventListener('load', initScratch);
+window.addEventListener('resize', initScratch);
+    </script>
+</body>
+</html>
