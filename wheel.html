@@ -266,8 +266,12 @@ function spinWheel() {
 }
 
 function showResult() {
-    const normalizedRotation = currentRotation % 360;
-    const segmentIndex = Math.floor((360 - normalizedRotation + 22.5) / 45) % 8;
+    const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+    const segments = prizes.length;
+    const anglePerSegment = 360 / segments;
+    // 指针固定在正上方；画布旋转为顺时针正方向，因此指针对应到转盘坐标需要用 360 - rotation。
+    const pointerAngle = (360 - normalizedRotation) % 360;
+    const segmentIndex = Math.floor(pointerAngle / anglePerSegment) % segments;
     
     const prize = prizes[segmentIndex];
     const resultDiv = document.getElementById('result');
